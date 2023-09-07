@@ -27,6 +27,7 @@ export function SelectBox({
   placeholder,
   rounded,
   onChange,
+  onExchangeFilterChange,
 }) {
   const controlClassNames = () => {
     return `${
@@ -36,6 +37,9 @@ export function SelectBox({
   const handleChange = (selectedOption) => {
     if (onChange) {
       onChange(selectedOption);
+    }
+    if (onExchangeFilterChange) {
+      onExchangeFilterChange(selectedOption);
     }
   };
 

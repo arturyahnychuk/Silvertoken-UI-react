@@ -38,3 +38,7 @@ body {
   background: theme("colors.error-16");
   border: 1px solid theme("colors.error");
 }
+
+.test {
+  display: block;
+}

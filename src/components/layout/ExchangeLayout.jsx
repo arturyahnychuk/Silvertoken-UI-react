@@ -11,7 +11,7 @@ import { useState } from "react";
 
 import SLVTCoin from "../../assets/images/coins/SLVT.svg";
 import USDCCoin from "../../assets/images/coins/USDC.svg";
-//import USDC2Coin from "../../assets/images/coins/USDC2.svg";
+import USDC2Coin from "../../assets/images/coins/USDC2.svg";
 import SLVDCoin from "../../assets/images/coins/SLVD.svg";
 import MATICCoin from "../../assets/images/coins/MATIC.svg";
 
@@ -19,26 +19,52 @@ const ethereumSendOptions = [
   { value: "slvt", label: "SLVT", labelImage: SLVTCoin },
   { value: "usdc", label: "USDC", labelImage: USDCCoin },
   { value: "slvd", label: "SLVD", labelImage: SLVDCoin },
-  { value: "eth", label: "ETH", labelImage: EthereumCoin },
 ];
 const ethereumReceiveOptions = [
   { value: "slvd", label: "SLVD", labelImage: SLVDCoin },
   { value: "usdc", label: "USDC", labelImage: USDCCoin },
 ];
-
+const ethereumReceiveOptionsWhenSLVD = [
+  { value: "slvt", label: "SLVT", labelImage: SLVTCoin },
+  { value: "usdc", label: "USDC", labelImage: USDCCoin },
+];
+const ethereumReceiveOptionsSwap = [
+  { value: "slvd", label: "SLVD", labelImage: SLVDCoin },
+];
+const ethereumReceiveOptionsWhenSLVT = [
+  { value: "slvd", label: "SLVD", labelImage: SLVDCoin },
+];
+const polygonReceiveOptionsSwapWhenSLVT = [
+  { value: "slvd", label: "SLVD", labelImage: SLVDCoin },
+];
 const polygonSendOptions = [
   { value: "slvt", label: "SLVT", labelImage: SLVTCoin },
-  //{ value: "usdc", label: "USDC", labelImage: USDC2Coin },
-  { value: "usdc", label: "USDC", labelImage: USDCCoin },
+  { value: "usdc", label: "USDC", labelImage: USDC2Coin },
   { value: "slvd", label: "SLVD", labelImage: SLVDCoin },
-  { value: "matic", label: "MATIC", labelImage: MATICCoin },
 ];
 const polygonReceiveOptions = [
   { value: "slvd", label: "SLVD", labelImage: SLVDCoin },
   { value: "usdc", label: "USDC", labelImage: USDCCoin },
 ];
+const polygonReceiveOptionsSwapWhenSLVD = [
+  { value: "slvt", label: "SLVT", labelImage: SLVTCoin },
+  { value: "usdc", label: "USDC", labelImage: USDCCoin },
+];
+const polygonReceiveOptionsSwap = [
+  { value: "slvd", label: "SLVD", labelImage: SLVDCoin },
+];
+const bridgeSend = [{ value: "slvt", label: "SLVT", labelImage: SLVTCoin }];
 
 export function ExchangeLayout() {
+  const [switched, setSwitched] = useState(false);
+  const handleSwitch = () => {
+    if (switched) {
+      setSwitched(false);
+    } else {
+      setSwitched(true);
+    }
+  };
+
   const options = [
     { value: "ethereum", label: "Ethereum", labelImage: EthereumCoin },
     { value: "polygon", label: "Polygon", labelImage: PolygonCoin },
@@ -51,8 +77,13 @@ export function ExchangeLayout() {
   };
 
   const [activeFilter, setActiveFilter] = useState("swap");
+  const [exchangeFilter, setExchangeFilter] = useState("");
   const handleFilter = (val) => {
     setActiveFilter(val);
+  };
+  const [receiveSelected, setReceiveSelected] = useState(0);
+  const handleExchangeFilter = (val) => {
+    setExchangeFilter(val);
   };
 
   const handleSubmit = () => {
@@ -129,11 +160,15 @@ export function ExchangeLayout() {
             onFilter={handleFilter}
           />
         </ul>
-        <SelectBox
-          options={options}
-          selected={options[0]}
-          onChange={handleChange}
-        />
+        {activeFilter === "swap" ? (
+          <SelectBox
+            options={options}
+            selected={options[0]}
+            onChange={handleChange}
+          />
+        ) : (
+          <></>
+        )}
       </div>
 
       <div className="overflow-hidden">
@@ -141,46 +176,189 @@ export function ExchangeLayout() {
       </div>
 
       <div className="relative w-full flex flex-col gap-2 mt-4 mb-2">
-        {selectedOpt === "ethereum" ? (
-          <ExchangeItem
-            type="Send"
-            amount="0.00"
-            value={10}
-            options={ethereumSendOptions}
-          />
+        {activeFilter === "swap" ? (
+          <>
+            {selectedOpt === "ethereum" ? (
+              <>
+                <ExchangeItem
+                  activeFilter={activeFilter}
+                  type="Send"
+                  amount="0.00"
+                  value={10}
+                  options={ethereumSendOptions}
+                  isSwitched={switched}
+                  onExchangeFilterChange={handleExchangeFilter}
+                />
+              </>
+            ) : (
+              <>
+                <ExchangeItem
+                  activeFilter={activeFilter}
+                  type="Send"
+                  amount="0.00"
+                  value={10}
+                  options={polygonSendOptions}
+                  isSwitched={switched}
+                  onExchangeFilterChange={handleExchangeFilter}
+                />
+              </>
+            )}
+          </>
         ) : (
           <>
             <ExchangeItem
+              activeFilter={activeFilter}
               type="Send"
               amount="0.00"
               value={10}
-              options={polygonSendOptions}
+              options={bridgeSend}
+              isSwitched={switched}
+              onExchangeFilterChange={handleExchangeFilter}
             />
           </>
         )}
-        <div
-          className={`${
-            selectedOpt === "ethereum" ? "bg-blue-300" : "bg-purple-300"
-          } absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[32px] h-[32px] rounded-[12px] flex items-center justify-center`}
-        >
-          <img src={SwapVert} alt="swap vertical" />
-        </div>
-        {selectedOpt === "ethereum" ? (
-          <ExchangeItem
-            type="Receive"
-            amount="0.00"
-            value={0}
-            options={ethereumReceiveOptions}
-          />
+
+        {activeFilter === "bridge" ? (
+          <div
+            onClick={handleSwitch}
+            className={`${
+              selectedOpt === "ethereum" ? "bg-blue-300" : "bg-purple-300"
+            } absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[32px] h-[32px] rounded-[12px] flex items-center justify-center cursor-pointer`}
+          >
+            <img src={SwapVert} alt="swap vertical" />
+          </div>
+        ) : (
+          <></>
+        )}
+
+        {activeFilter === "swap" ? (
+          <>
+            {selectedOpt === "ethereum" ? (
+              <>
+                {activeFilter === "swap" ? (
+                  <>
+                    {exchangeFilter.value === "usdc" ? (
+                      <ExchangeItem
+                        activeFilter={activeFilter}
+                        type="Receive"
+                        amount="0.00"
+                        value={0}
+                        selectedOption={receiveSelected}
+                        options={ethereumReceiveOptionsSwap}
+                        isSwitched={switched}
+                      />
+                    ) : exchangeFilter.value === "slvd" ? (
+                      <>
+                        <ExchangeItem
+                          activeFilter={activeFilter}
+                          type="Receive"
+                          amount="0.00"
+                          value={0}
+                          selectedOption={receiveSelected}
+                          options={ethereumReceiveOptionsWhenSLVD}
+                          isSwitched={switched}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <ExchangeItem
+                          activeFilter={activeFilter}
+                          type="Receive"
+                          amount="0.00"
+                          value={0}
+                          selectedOption={receiveSelected}
+                          options={ethereumReceiveOptionsWhenSLVT}
+                          isSwitched={switched}
+                        />
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <ExchangeItem
+                      activeFilter={activeFilter}
+                      type="Receive"
+                      amount="0.00"
+                      value={0}
+                      selectedOption={receiveSelected}
+                      options={ethereumReceiveOptions}
+                      isSwitched={switched}
+                    />
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                {activeFilter === "swap" ? (
+                  <>
+                    {exchangeFilter.value === "usdc" ? (
+                      <>
+                        <ExchangeItem
+                          activeFilter={activeFilter}
+                          type="Receive"
+                          amount="0.00"
+                          value={0}
+                          selectedOption={receiveSelected}
+                          options={polygonReceiveOptionsSwap}
+                          isSwitched={switched}
+                        />
+                      </>
+                    ) : exchangeFilter.value === "slvd" ? (
+                      <>
+                        <ExchangeItem
+                          activeFilter={activeFilter}
+                          type="Receive"
+                          amount="0.00"
+                          value={0}
+                          selectedOption={receiveSelected}
+                          options={polygonReceiveOptionsSwapWhenSLVD}
+                          isSwitched={switched}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <>
+                          <ExchangeItem
+                            activeFilter={activeFilter}
+                            type="Receive"
+                            amount="0.00"
+                            selectedOption={receiveSelected}
+                            value={0}
+                            options={polygonReceiveOptionsSwapWhenSLVT}
+                            isSwitched={switched}
+                          />
+                        </>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <ExchangeItem
+                      activeFilter={activeFilter}
+                      type="Receive"
+                      amount="0.00"
+                      value={0}
+                      options={polygonReceiveOptions}
+                      selectedOption={receiveSelected}
+                      isSwitched={switched}
+                    />
+                  </>
+                )}
+              </>
+            )}
+          </>
         ) : (
           <>
-            <ExchangeItem
-              type="Receive"
-              amount="0.00"
-              value={0}
-              options={polygonReceiveOptions}
-            />
-          </>
+          <ExchangeItem
+            activeFilter={activeFilter}
+            type="Receive"
+            amount="0.00"
+            value={10}
+            options={bridgeSend}
+            isSwitched={switched}
+            onExchangeFilterChange={handleExchangeFilter}
+          />
+        </>
         )}
       </div>
 
