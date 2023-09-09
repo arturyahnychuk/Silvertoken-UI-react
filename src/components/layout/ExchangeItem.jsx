@@ -39,9 +39,6 @@ export function ExchangeItem({
             <p className="font-mainRegular text-xs text-textSecondary">
               {type}
             </p>
-            <p className="font-mainRegular text-xs text-textSecondary">
-              ${amount}
-            </p>
           </>
         ) : (
           <>
@@ -71,9 +68,6 @@ export function ExchangeItem({
                 </div>
               )}
             </div>
-            <p className="font-mainRegular text-xs text-textSecondary">
-              ${amount}
-            </p>
           </>
         )}
       </div>
